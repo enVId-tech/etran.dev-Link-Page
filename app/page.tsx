@@ -3,8 +3,10 @@ import React from "react";
 import styles from "@/styles/page.module.scss";
 import dotenv from "dotenv";
 import path from "path";
+import {Work_Sans} from 'next/font/google';
+import {NextFont} from "next/dist/compiled/@next/font";
 
-dotenv.config({ path: path.resolve(__dirname, ".env") });
+dotenv.config({path: path.resolve(__dirname, ".env")});
 
 interface DomainObject {
     domain_names: string;
@@ -15,7 +17,36 @@ interface TokenResponse {
     token: string;
 }
 
-async function checkUrl(url: string): Promise<boolean>  {
+const Work_Sans_300: NextFont = Work_Sans({
+    weight: "300",
+    style: 'normal',
+    subsets: ['latin'],
+})
+const Work_Sans_500: NextFont = Work_Sans({
+    weight: "500",
+    style: 'normal',
+    subsets: ['latin'],
+})
+
+const ignoreUrls: string[] = [
+    "2fa.etran.dev",
+    "immich.etran.dev",
+    "npmanager.etran.dev",
+    "portainer.etran.dev",
+    "vaultwarden.etran.dev",
+    "code-server.etran.dev",
+    "dav.etran.dev",
+    "truenas-scale.etran.dev",
+    "cis190c.etran.dev",
+    "2factorauth.etran.dev",
+    "codingpowerdrive.etran.dev",
+    "precal.etran.dev.etran.dev",
+    "music.etran.dev",
+    "drawio.etran.dev",
+    "netdata.etran.dev"
+]
+
+async function checkUrl(url: string): Promise<boolean> {
     try {
         const response = await fetch('https://' + url, {
             method: 'HEAD'
@@ -34,36 +65,36 @@ async function getToken(): Promise<string> {
         return "";
     }
 
-  const data = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      "identity": dotenv.config().parsed?.IDENTITY,
-      "secret": dotenv.config().parsed?.SECRET
-    })
-  }
+    const data = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            "identity": dotenv.config().parsed?.IDENTITY,
+            "secret": dotenv.config().parsed?.SECRET
+        })
+    }
 
-  const response: Response = await fetch('http://192.168.1.89:81/api/tokens', data);
+    const response: Response = await fetch('http://192.168.1.89:81/api/tokens', data);
 
-  if (!response.ok) {
-    console.log('Error: ', response.statusText);
-    return "";
-  }
+    if (!response.ok) {
+        console.log('Error: ', response.statusText);
+        return "";
+    }
 
-  const json: TokenResponse = await response.json();
+    const json: TokenResponse = await response.json();
 
-  if (!json.token) {
-    console.log('Error: ', 'Token not found');
-    return "";
-  }
+    if (!json.token) {
+        console.log('Error: ', 'Token not found');
+        return "";
+    }
 
-  return json.token;
+    return json.token;
 }
 
 async function getProxyHosts(): Promise<DomainObject[]> {
-   const token: string = await getToken();
+    const token: string = await getToken();
 
     const response2 = await fetch('http://192.168.1.89:81/api/nginx/proxy-hosts', {
         method: 'GET',
@@ -73,14 +104,13 @@ async function getProxyHosts(): Promise<DomainObject[]> {
         }
     });
 
-    const json2: DomainObject[] = await response2.json();
+    let json2: DomainObject[];
+    json2 = await response2.json();
 
     const responseArr: DomainObject[] = [];
 
-    console.log(json2);
-
     for (const key in json2) {
-        if (!json2[key].domain_names) {
+        if (!json2[key].domain_names || ignoreUrls.includes(json2[key].domain_names[0])) {
             continue;
         }
 
@@ -114,10 +144,8 @@ async function getRedirectHosts(): Promise<DomainObject[]> {
 
     const responseArr: DomainObject[] = [];
 
-    console.log(json2);
-
     for (const key in json2) {
-        if (!json2[key].domain_names) {
+        if (!json2[key].domain_names || ignoreUrls.includes(json2[key].domain_names[0])) {
             continue;
         }
 
@@ -133,35 +161,40 @@ async function getRedirectHosts(): Promise<DomainObject[]> {
 }
 
 export default async function Home(): Promise<React.ReactElement> {
-  const proxyData: DomainObject[] = await getProxyHosts();
-  const redirectData: DomainObject[] = await getRedirectHosts();
+    const proxyData: DomainObject[] = await getProxyHosts();
+    const redirectData: DomainObject[] = await getRedirectHosts();
 
-  console.log(redirectData)
+    return (
+        <div className={`${styles.page} ${Work_Sans_500.className}`}>
+            <div className={styles.main}>
+                <div className={`${styles.proxyData}`}>
+                    <div className={styles.title}>Locally Hosted Domains</div>
+                    <div className={styles.proxyDataDiv}>
+                        {
+                            proxyData.map((item: DomainObject, index: number) => {
+                                return (
+                                    <a className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
+                                       href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+                <div className={styles.redirectData}>
+                    <div className={styles.title}>Website Redirects</div>
+                    <div className={styles.redirectDataDiv}>
+                        {
 
-  return (
-    <div className={styles.page}>
-        <div className={styles.proxyData}>
-      {
-          proxyData.map((item: DomainObject, index: number) => {
-          return (
-            <div key={index}>
-              <a className={`${item.isEnabled ? styles.enabled : styles.disabled}`} href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
+                            redirectData.map((item: DomainObject, index: number) => {
+                                return (
+                                    <a className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
+                                       href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
             </div>
-          )
-        })
-      }
         </div>
-        <div className={styles.redirectData}>
-      {
-          redirectData.map((item: DomainObject, index: number) => {
-              return (
-                  <div key={index}>
-                      <a className={`${item.isEnabled ? styles.enabled : styles.disabled}`} href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
-                  </div>
-              )
-          })
-      }
-        </div>
-    </div>
-  );
+    );
 }
