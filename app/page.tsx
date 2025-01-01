@@ -28,36 +28,20 @@ const Work_Sans_500: NextFont = Work_Sans({
     subsets: ['latin'],
 })
 
-const ignoreUrls: string[] = [
-    "2fa.etran.dev",
-    "immich.etran.dev",
-    "npmanager.etran.dev",
-    "portainer.etran.dev",
-    "vaultwarden.etran.dev",
-    "code-server.etran.dev",
-    "dav.etran.dev",
-    "truenas-scale.etran.dev",
-    "cis190c.etran.dev",
-    "2factorauth.etran.dev",
-    "codingpowerdrive.etran.dev",
-    "precal.etran.dev.etran.dev",
-    "music.etran.dev",
-    "drawio.etran.dev",
-    "netdata.etran.dev"
-]
+let ignoreUrls: string[] | undefined = dotenv.config().parsed?.IGNORE_URLS.split(',');
 
-async function checkUrl(url: string): Promise<boolean> {
-    try {
-        const response = await fetch('https://' + url, {
-            method: 'HEAD'
-        });
-
-        return response.ok;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
+// async function checkUrl(url: string): Promise<boolean> {
+//     try {
+//         const response = await fetch('https://' + url, {
+//             method: 'HEAD'
+//         });
+//
+//         return response.ok;
+//     } catch (error) {
+//         console.error(error);
+//         return false;
+//     }
+// }
 
 async function getToken(): Promise<string> {
     if (!dotenv.config().parsed?.IDENTITY || !dotenv.config().parsed?.SECRET) {
@@ -104,10 +88,13 @@ async function getProxyHosts(): Promise<DomainObject[]> {
         }
     });
 
-    let json2: DomainObject[];
-    json2 = await response2.json();
+    const json2: DomainObject[] = await response2.json();
 
     const responseArr: DomainObject[] = [];
+
+    if (ignoreUrls === undefined) {
+        ignoreUrls = [];
+    }
 
     for (const key in json2) {
         if (!json2[key].domain_names || ignoreUrls.includes(json2[key].domain_names[0])) {
@@ -144,6 +131,10 @@ async function getRedirectHosts(): Promise<DomainObject[]> {
 
     const responseArr: DomainObject[] = [];
 
+    if (ignoreUrls === undefined) {
+        ignoreUrls = [];
+    }
+
     for (const key in json2) {
         if (!json2[key].domain_names || ignoreUrls.includes(json2[key].domain_names[0])) {
             continue;
@@ -157,6 +148,10 @@ async function getRedirectHosts(): Promise<DomainObject[]> {
         responseArr.push(obj);
     }
 
+    // for (const key in responseArr) {
+    //     responseArr[key].isEnabled = await checkUrl(responseArr[key].domain_names);
+    // }
+
     return responseArr;
 }
 
@@ -168,12 +163,13 @@ export default async function Home(): Promise<React.ReactElement> {
         <div className={`${styles.page} ${Work_Sans_500.className}`}>
             <div className={styles.main}>
                 <div className={`${styles.proxyData}`}>
-                    <div className={styles.title}>Locally Hosted Domains</div>
+                    <div className={styles.title}>Locally Hosted Website</div>
                     <div className={styles.proxyDataDiv}>
                         {
                             proxyData.map((item: DomainObject, index: number) => {
                                 return (
-                                    <a className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
+                                    <a key={`${index}proxyData`}
+                                       className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
                                        href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
                                 )
                             })
@@ -187,7 +183,8 @@ export default async function Home(): Promise<React.ReactElement> {
 
                             redirectData.map((item: DomainObject, index: number) => {
                                 return (
-                                    <a className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
+                                    <a key={`${index}redirectData`}
+                                       className={`${styles.link} ${item.isEnabled ? styles.enabled : styles.disabled} ${Work_Sans_300.className}`}
                                        href={`${'https://' + item.domain_names}`}>{item.domain_names}</a>
                                 )
                             })
