@@ -3,10 +3,15 @@ import React from "react";
 import styles from "@/styles/page.module.scss";
 import dotenv from "dotenv";
 import path from "path";
+import {fileURLToPath} from "url";
 import {Work_Sans} from 'next/font/google';
 import {NextFont} from "next/dist/compiled/@next/font";
 
-dotenv.config({path: path.resolve(__dirname, ".env")});
+const __filename: string = fileURLToPath(import.meta.url);
+const __dirname: string = path.dirname(__filename);
+const filepath: string = path.resolve(__dirname, "..", "stack.env");
+
+dotenv.config({path: filepath});
 
 interface DomainObject {
     domain_names: string;
@@ -28,7 +33,8 @@ const Work_Sans_500: NextFont = Work_Sans({
     subsets: ['latin'],
 })
 
-let ignoreUrls: string[] | undefined = dotenv.config().parsed?.IGNORE_URLS.split(',');
+let ignoreUrls: string[] | undefined = process.env.IGNORE_URLS?.split(",");
+;
 
 // async function checkUrl(url: string): Promise<boolean> {
 //     try {
@@ -44,7 +50,7 @@ let ignoreUrls: string[] | undefined = dotenv.config().parsed?.IGNORE_URLS.split
 // }
 
 async function getToken(): Promise<string> {
-    if (!dotenv.config().parsed?.IDENTITY || !dotenv.config().parsed?.SECRET) {
+    if (!process.env.IDENTITY || !process.env.SECRET) {
         console.log('Error: ', 'Identity or Secret not found');
         return "";
     }
@@ -55,8 +61,8 @@ async function getToken(): Promise<string> {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            "identity": dotenv.config().parsed?.IDENTITY,
-            "secret": dotenv.config().parsed?.SECRET
+            "identity": process.env.IDENTITY,
+            "secret": process.env.SECRET
         })
     }
 
@@ -92,7 +98,7 @@ async function getProxyHosts(): Promise<DomainObject[]> {
 
     const responseArr: DomainObject[] = [];
 
-    if (ignoreUrls === undefined) {
+    if (!ignoreUrls) {
         ignoreUrls = [];
     }
 
@@ -131,7 +137,7 @@ async function getRedirectHosts(): Promise<DomainObject[]> {
 
     const responseArr: DomainObject[] = [];
 
-    if (ignoreUrls === undefined) {
+    if (!ignoreUrls) {
         ignoreUrls = [];
     }
 
@@ -163,7 +169,7 @@ export default async function Home(): Promise<React.ReactElement> {
         <div className={`${styles.page} ${Work_Sans_500.className}`}>
             <div className={styles.main}>
                 <div className={`${styles.proxyData}`}>
-                    <div className={styles.title}>Locally Hosted Website</div>
+                    <h1 className={styles.title}>Locally Hosted Website</h1>
                     <div className={styles.proxyDataDiv}>
                         {
                             proxyData.map((item: DomainObject, index: number) => {
@@ -177,7 +183,7 @@ export default async function Home(): Promise<React.ReactElement> {
                     </div>
                 </div>
                 <div className={styles.redirectData}>
-                    <div className={styles.title}>Website Redirects</div>
+                    <h1 className={styles.title}>Website Redirects</h1>
                     <div className={styles.redirectDataDiv}>
                         {
 
