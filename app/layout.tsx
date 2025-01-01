@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "@/styles/globals.scss";
+import icon from "@/public/envidtech.png";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -15,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
     title: "etran.dev URL Map",
     description: "An active URL Mapping of etran.dev URLs",
+    icons: {
+        icon: icon.src
+    }
 };
 
 export default function RootLayout({
