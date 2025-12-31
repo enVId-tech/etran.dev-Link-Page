@@ -11,19 +11,19 @@
 
 @keyframes glitch {
   0% {
-    text-shadow: 2px 0 #0f0, -2px 0 #f00;
+    text-shadow: 1px 0 #0f0, -1px 0 #f00;
   }
   25% {
-    text-shadow: -2px 0 #0f0, 2px 0 #f00;
+    text-shadow: -1px 0 #0f0, 1px 0 #f00;
   }
   50% {
-    text-shadow: 2px 2px #0f0, -2px -2px #f00;
+    text-shadow: 1px 1px #0f0, -1px -1px #f00;
   }
   75% {
-    text-shadow: -2px 2px #0f0, 2px -2px #f00;
+    text-shadow: -1px 1px #0f0, 1px -1px #f00;
   }
   100% {
-    text-shadow: 2px 0 #0f0, -2px 0 #f00;
+    text-shadow: 1px 0 #0f0, -1px 0 #f00;
   }
 }
 

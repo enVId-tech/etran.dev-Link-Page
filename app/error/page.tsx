@@ -9,13 +9,26 @@ export default function Error() {
         '',
         'Analyzing error...',
         'Checking system logs...',
-        `Host '${window.location.host}' status: unreachable`,
+        `Host status: unreachable`,
         'Please try again later.'
     ]);
     const [currentLine, setCurrentLine] = useState<number>(0);
     const [currentPrompt, setCurrentPrompt] = useState<string>(promptLines[0]);
-    const [errorCode, setErrorCode] = useState<string>('');
+    const [errorCode, setErrorCode] = useState<string>('00000');
+    const [mounted, setMounted] = useState(false);
     const cursorRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        setMounted(true);
+        // Update host name on client side only
+        if (typeof window !== 'undefined') {
+            setPromptLines(prev => {
+                const newLines = [...prev];
+                newLines[3] = `Host '${window.location.host}' status: unreachable`;
+                return newLines;
+            });
+        }
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -68,14 +81,16 @@ export default function Error() {
 
         window.addEventListener('resize', handleResize);
 
-        const randomErrorCode = Math.floor(Math.random() * 0xFFFFF).toString(16).toUpperCase().padStart(5, '0');
-        setErrorCode(randomErrorCode);
+        if (mounted) {
+            const randomErrorCode = Math.floor(Math.random() * 0xFFFFF).toString(16).toUpperCase().padStart(5, '0');
+            setErrorCode(randomErrorCode);
+        }
 
         return () => {
             clearInterval(interval);
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+    }, [mounted]);
 
     useEffect(() => {
         const promptInterval = setInterval(() => {
@@ -127,7 +142,7 @@ export default function Error() {
                         <button onClick={() => window.location.reload()} className={styles.retryButton}>
                             <span className={styles.buttonPrefix}>{'>'}</span> RETRY
                         </button>
-                        <button onClick={() => window.location.href = '/'} className={styles.homeButton}>
+                        <button onClick={() => window.location.href = '/links'} className={styles.homeButton}>
                             <span className={styles.buttonPrefix}>{'>'}</span> LINKS
                         </button>
                     </div>
