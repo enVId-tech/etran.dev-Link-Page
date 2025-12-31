@@ -1,10 +1,21 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from '@/styles/error.module.scss';
 
 export default function Error() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const promptLines = [
+        '',
+        'Analyzing error...',
+        'Checking system logs...',
+        'Link status: unreachable',
+        'Please try again later.'
+    ];
+    const [currentLine, setCurrentLine] = useState<number>(0);
+    const [currentPrompt, setCurrentPrompt] = useState<string>(promptLines[0]);
+    const [errorCode, setErrorCode] = useState<string>('');
+    const cursorRef = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -57,10 +68,40 @@ export default function Error() {
 
         window.addEventListener('resize', handleResize);
 
+        const randomErrorCode = Math.floor(Math.random() * 0xFFFFF).toString(16).toUpperCase().padStart(5, '0');
+        setErrorCode(randomErrorCode);
+
         return () => {
             clearInterval(interval);
             window.removeEventListener('resize', handleResize);
         };
+    }, []);
+
+    useEffect(() => {
+        const promptInterval = setInterval(() => {
+            
+            setCurrentLine((prevLine) => {
+                if (prevLine >= promptLines.length - 1) {
+                    return prevLine;
+                }
+                const nextLine = (prevLine + 1)
+                for (let i = 0; i < promptLines[nextLine].length; i++) {
+                    setTimeout(() => {
+                        setCurrentPrompt(promptLines[nextLine].substring(0, i + 1));
+                        if (cursorRef.current) {
+                            if (i === promptLines[nextLine].length - 1) {
+                                cursorRef.current.classList.add(styles.visible);
+                            } else {
+                                cursorRef.current.classList.remove(styles.visible);
+                            }
+                        }
+                    }, i * 20);
+                }
+                return nextLine;
+            });
+        }, 1500);
+
+        return () => clearInterval(promptInterval);
     }, []);
 
     return (
@@ -75,7 +116,7 @@ export default function Error() {
 
                     <h1 className={styles.errorTitle}>SYSTEM ERROR</h1>
 
-                    <div className={styles.errorCode}>ERROR_CODE: 0x{Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase()}</div>
+                    <div className={styles.errorCode}>ERROR_CODE: 0x{errorCode}</div>
 
                     <p className={styles.errorMessage}>
                         Error 404: The requested resource was not found on this server.
@@ -93,10 +134,18 @@ export default function Error() {
 
                     <div className={styles.terminal}>
                         <div className={styles.terminalLine}>
-                            <span className={styles.prompt}>$</span> Analyzing error...
-                        </div>
-                        <div className={styles.terminalLine}>
-                            <span className={styles.prompt}>$</span> <span className={styles.blinking}>_</span>
+                            <span>
+                                {promptLines.slice(1, currentLine).map((line, index) => (
+                                    <span key={index}>
+                                        <span className={styles.prompt}>$</span>{line}
+                                        <span className={styles.terminalBreak}></span>
+                                    </span>
+                                ))}
+
+                                <span className={styles.prompt}>$</span> 
+                                {currentPrompt}
+                                <span ref={cursorRef}>█</span>
+                            </span>
                         </div>
                     </div>
                 </div>

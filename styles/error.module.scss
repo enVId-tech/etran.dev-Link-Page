@@ -258,8 +258,13 @@
   font-weight: bold;
 }
 
-.blinking {
+.visible {
   animation: blink 1s step-end infinite;
+}
+
+.terminalBreak {
+  display: block;
+  margin: 1.5rem 0;
 }
 
 @media (max-width: 768px) {
