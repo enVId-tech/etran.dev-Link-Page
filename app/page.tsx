@@ -66,7 +66,7 @@ async function getToken(): Promise<string> {
         })
     }
 
-    const response: Response = await fetch('http://192.168.1.89:81/api/tokens', data);
+    const response: Response = await fetch('http://192.168.1.141:81/api/tokens', data);
 
     if (!response.ok) {
         console.log('Error: ', response.statusText);
@@ -86,7 +86,7 @@ async function getToken(): Promise<string> {
 async function getProxyHosts(): Promise<DomainObject[]> {
     const token: string = await getToken();
 
-    const response2 = await fetch('http://192.168.1.89:81/api/nginx/proxy-hosts', {
+    const response2 = await fetch('http://192.168.1.141:81/api/nginx/proxy-hosts', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -125,7 +125,7 @@ async function getProxyHosts(): Promise<DomainObject[]> {
 async function getRedirectHosts(): Promise<DomainObject[]> {
     const token: string = await getToken();
 
-    const response2 = await fetch('http://192.168.1.89:81/api/nginx/redirection-hosts', {
+    const response2 = await fetch('http://192.168.1.141:81/api/nginx/redirection-hosts', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
