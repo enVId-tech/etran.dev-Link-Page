@@ -5,13 +5,13 @@ import styles from '@/styles/error.module.scss';
 
 export default function Error() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const promptLines = [
+    const [promptLines, setPromptLines] = useState<string[]>([
         '',
         'Analyzing error...',
         'Checking system logs...',
-        'Link status: unreachable',
+        `Host '${window.location.host}' status: unreachable`,
         'Please try again later.'
-    ];
+    ]);
     const [currentLine, setCurrentLine] = useState<number>(0);
     const [currentPrompt, setCurrentPrompt] = useState<string>(promptLines[0]);
     const [errorCode, setErrorCode] = useState<string>('');
@@ -79,7 +79,7 @@ export default function Error() {
 
     useEffect(() => {
         const promptInterval = setInterval(() => {
-            
+
             setCurrentLine((prevLine) => {
                 if (prevLine >= promptLines.length - 1) {
                     return prevLine;
@@ -142,7 +142,7 @@ export default function Error() {
                                     </span>
                                 ))}
 
-                                <span className={styles.prompt}>$</span> 
+                                <span className={styles.prompt}>$</span>
                                 {currentPrompt}
                                 <span ref={cursorRef}>█</span>
                             </span>
