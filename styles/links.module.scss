@@ -170,6 +170,14 @@
     border: 1px solid rgba(0, 255, 0, 0.5);
     border-radius: 4px;
     background: rgba(0, 255, 0, 0.05);
+
+    &.online {
+        color: #0f0;
+    }
+
+    &.loading {
+        color: #ff0;
+    }
 }
 
 .linksGrid {
@@ -350,20 +358,15 @@
     color: #0f0;
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
+}
 
-    &:last-child {
-        margin-bottom: 0;
+.terminalBreak {
+  display: block;
+  margin: 1.5rem 0;
+}
 
-        &::after {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 14px;
-            background: #0f0;
-            margin-left: 2px;
-            animation: blink 1s step-end infinite;
-        }
-    }
+.visible {
+  animation: blink 1s step-end infinite;
 }
 
 @media (max-width: 768px) {

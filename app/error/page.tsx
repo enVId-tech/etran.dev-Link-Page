@@ -41,33 +41,44 @@ export default function Error() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const fontSize: number = 16;
-        const columns: number = Math.floor(canvas.width / fontSize);
-        const drops: number[] = Array(columns).fill(1);
+        const fontSize = 12;
+        const columns = Math.floor(canvas.width / fontSize);
+        const dropsTop: number[] = Array(columns).fill(1);
+        const dropsBottom: number[] = Array(columns).fill(1);
 
-        const binary: string = '01';
+        const binary = '01';
 
         const draw = () => {
-            // Black background with slight transparency for trail effect
             ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = '#0F0'; // Green text
+            ctx.fillStyle = '#0F0';
             ctx.font = `${fontSize}px monospace`;
+            
+            // Draw from top to bottom
+            for (let i = 0; i < dropsTop.length; i++) {
+                const text = binary[Math.floor(Math.random() * binary.length)];
+                ctx.fillText(text, i * fontSize, dropsTop[i] * fontSize);
 
-            for (let i: number = 0; i < drops.length; i++) {
-                // Random binary character
-                const text: string = binary[Math.floor(Math.random() * binary.length)];
-
-                // Draw the character
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                // Reset drop to top randomly
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
+                const probability = 0.995; // The likelihood of displaying a character (1 - probability)
+                
+                if (dropsTop[i] * fontSize > canvas.height && Math.random() > probability) {
+                    dropsTop[i] = 0;
                 }
 
-                drops[i]++;
+                dropsTop[i]++;
+            }
+
+            // Draw from bottom to top
+            for (let i = 0; i < dropsBottom.length; i++) {
+                const text = binary[Math.floor(Math.random() * binary.length)];
+                ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize);
+                const probability = 0.995; // The likelihood of displaying a character
+                
+                if (dropsBottom[i] * fontSize > canvas.height && Math.random() > probability) {
+                    dropsBottom[i] = 0;
+                }
+                dropsBottom[i]++;
             }
         };
 
