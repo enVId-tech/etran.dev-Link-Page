@@ -12,7 +12,7 @@ COPY . /app
 
 RUN npm install
 
-# RUN npm run build
+RUN npm run build
 
 # Make port 3090 available to the world outside this container
 EXPOSE 3090
