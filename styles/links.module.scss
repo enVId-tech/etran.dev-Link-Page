@@ -197,6 +197,57 @@
     transition: all 0.3s ease;
     animation: slideUp 0.8s ease-out backwards;
 
+    &.inactive {
+        border-color: #f00;
+        opacity: 0.6;
+        
+        .linkTitle,
+        .linkDescription,
+        .linkUrl code,
+        .linkNumber,
+        .prompt,
+        .buttonPrefix {
+            color: #f00;
+        }
+
+        .linkDescription {
+            opacity: 0.6;
+            font-weight: bold;
+        }
+
+        .linkUrl {
+            background: rgba(255, 0, 0, 0.05);
+            border-color: rgba(255, 0, 0, 0.2);
+        }
+        
+        .visitButton,
+        .copyButton {
+            border-color: #f00;
+            color: #f00;
+            pointer-events: none;
+            cursor: not-allowed;
+            
+            &::before {
+                background: rgba(255, 0, 0, 0.1);
+            }
+            
+            &:hover {
+                background: transparent;
+                box-shadow: none;
+                transform: none;
+            }
+        }
+        
+        &::before {
+            background: #f00;
+        }
+        
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+        }
+    }
+
     &.hidden {
         display: none;
     }

@@ -1,5 +1,19 @@
 import { connectToDatabase } from "@/app/utils/db";
+import { checkUrl } from "@/app/utils/validation";
 import { NextResponse } from "next/server";
+
+interface LinksActive {
+    link: string;
+    active: boolean;
+}
+
+interface LinkDocument {
+    id: number;
+    title: string;
+    url: string;
+    description: string;
+    icon: string;
+}
 
 export const revalidate = 1800;
 
@@ -8,12 +22,21 @@ export async function GET() {
         const { db } = await connectToDatabase();
         const collection = db.collection("links");
 
-        const links = await collection.find().toArray()
+        const linkData = await collection.find().toArray() as unknown as LinkDocument[];
+
+        // Use Promise.all to wait for all URL checks to complete
+        const linksActive: LinksActive[] = await Promise.all(
+            linkData.map(async (linkEntry: LinkDocument) => ({
+                link: linkEntry.url,
+                active: await checkUrl(linkEntry.url)
+            }))
+        );
 
         return NextResponse.json(
             {
                 success: true,
-                links: links || []
+                links: linkData || [],
+                linksActive: linksActive
             },
             {
                 headers: {

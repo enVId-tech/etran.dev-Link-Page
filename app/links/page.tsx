@@ -11,10 +11,16 @@ interface Link {
     icon?: string;
 }
 
+interface LinksActive {
+    link: string;
+    active: boolean;
+}
+
 export default function Links() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [copiedId, setCopiedId] = useState<number | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [linksActive, setLinksActive] = useState<LinksActive[]>([]);
     const [promptLines, _] = useState<string[]>([
         '',
         'Connection established.',
@@ -46,8 +52,13 @@ export default function Links() {
         const fetchLinks = async () => {
             const response = await fetch('/api/links');
             const data = await response.json();
-            console.log(data.links);
-            data.success ? setLinks(data.links) : console.error('Failed to fetch links:', data.error);
+            console.log(data);
+            if (data.success) {
+                setLinks(data.links);
+                setLinksActive(data.linksActive || []);
+            } else {
+                console.error('Failed to fetch links:', data.error);
+            }
         };
 
         fetchLinks();
@@ -203,10 +214,14 @@ export default function Links() {
                 </div>
 
                 <div className={styles.linksGrid}>
-                    {links.map((link, index) => (
+                    {links.map((link, index) => {
+                        const linkStatus = linksActive.find(la => la.link === link.url);
+                        const isInactive = linkStatus && !linkStatus.active;
+                        
+                        return (
                         <div
                             key={link.id}
-                            className={`${styles.linkCard} ${!loadingCompleted ? styles.hidden : ''}`}
+                            className={`${styles.linkCard} ${!loadingCompleted ? styles.hidden : ''} ${isInactive ? styles.inactive : ''}`}
                             style={mounted ? { animationDelay: `${index * 0.1}s` } : undefined}
                         >
                             <div className={styles.linkHeader}>
@@ -244,7 +259,7 @@ export default function Links() {
 
                             <div className={styles.cardScanline}></div>
                         </div>
-                    ))}
+                    )})}
                 </div>
             </div>
         </div>
