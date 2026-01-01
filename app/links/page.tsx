@@ -198,7 +198,7 @@ export default function Links() {
                         <div className={styles.terminalLine}>
                             <span>
                                 {promptLines.slice(1, currentLine).map((line, index) => (
-                                    <span key={index}>
+                                    <span key={`terminal-line-${index}`}>
                                         <span className={styles.prompt}>$</span>{line}
                                         <span className={styles.terminalBreak}></span>
                                     </span>

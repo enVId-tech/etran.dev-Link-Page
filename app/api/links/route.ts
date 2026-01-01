@@ -9,7 +9,7 @@ interface LinksActive {
 
 interface LinkDocument {
     _id?: unknown;
-    id?: number;
+    id: number;
     title: string;
     url: string;
     description: string;
@@ -27,7 +27,6 @@ export async function GET() {
 
         for (const link of linkData) {
             delete link._id;
-            delete link.id;
         }
 
         // Use Promise.all to wait for all URL checks to complete
