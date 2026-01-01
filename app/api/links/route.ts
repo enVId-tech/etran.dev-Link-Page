@@ -8,7 +8,8 @@ interface LinksActive {
 }
 
 interface LinkDocument {
-    id: number;
+    _id?: unknown;
+    id?: number;
     title: string;
     url: string;
     description: string;
@@ -23,6 +24,11 @@ export async function GET() {
         const collection = db.collection("links");
 
         const linkData = await collection.find().toArray() as unknown as LinkDocument[];
+
+        for (const link of linkData) {
+            delete link._id;
+            delete link.id;
+        }
 
         // Use Promise.all to wait for all URL checks to complete
         const linksActive: LinksActive[] = await Promise.all(

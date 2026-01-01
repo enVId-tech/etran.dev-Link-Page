@@ -52,7 +52,6 @@ export default function Links() {
         const fetchLinks = async () => {
             const response = await fetch('/api/links');
             const data = await response.json();
-            console.log(data);
             if (data.success) {
                 setLinks(data.links);
                 setLinksActive(data.linksActive || []);
