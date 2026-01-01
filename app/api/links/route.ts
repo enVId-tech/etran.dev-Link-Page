@@ -1,7 +1,7 @@
 import { connectToDatabase } from "@/app/utils/db";
 import { NextResponse } from "next/server";
 
-export const revalidate = 1200;
+export const revalidate = 1800;
 
 export async function GET() {
     try {
@@ -10,19 +10,10 @@ export async function GET() {
 
         const links = await collection.find().toArray()
 
-        if (!links) {
-            return NextResponse.json(
-                {
-                    success: true,
-                    links: []
-                }
-            )
-        }
-
         return NextResponse.json(
             {
                 success: true,
-                links: links
+                links: links || []
             },
             {
                 headers: {

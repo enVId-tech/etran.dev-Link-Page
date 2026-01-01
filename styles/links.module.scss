@@ -197,6 +197,10 @@
     transition: all 0.3s ease;
     animation: slideUp 0.8s ease-out backwards;
 
+    &.hidden {
+        display: none;
+    }
+
     &::before {
         content: '';
         position: absolute;
@@ -343,6 +347,7 @@
 
 .footer {
     animation: fadeIn 1s ease-out 0.4s backwards;
+    margin-bottom: 2rem;
 }
 
 .terminal {

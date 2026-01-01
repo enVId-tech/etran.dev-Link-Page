@@ -8,7 +8,7 @@ dotenv.config({ path: path.resolve(process.cwd(), 'stack.env') });
 const config = {
   // Use environment variables with fallbacks to prevent undefined errors
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017',
-  DB_NAME: process.env.CLIENT_DB || 'blogs'
+  DB_NAME: process.env.CLIENT_DB || 'links'
 };
 
 // Cached connection

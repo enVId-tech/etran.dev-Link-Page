@@ -1,13 +1,6 @@
-"use client";
-import {useEffect} from 'react';
+"use server";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-    useEffect(() => {
-        // Redirect to /links page on mount
-        window.location.href = '/error';
-    }, []);
-
-    return (
-        <></>
-    )
+export default async function Home() {
+    redirect('/error');
 }

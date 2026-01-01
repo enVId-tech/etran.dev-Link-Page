@@ -23,10 +23,8 @@ export default function Links() {
     ]);
     const [currentLine, setCurrentLine] = useState<number>(0);
     const [currentPrompt, setCurrentPrompt] = useState<string>(promptLines[0]);
-    const cursorRef = useRef<HTMLSpanElement>(null);
-
-    // Sample links - replace with your actual links
-    const links: Link[] = [
+    const [loadingCompleted, setLoadingCompleted] = useState<boolean>(false);
+    const [links, setLinks] = useState<Link[]>([
         {
             id: 1,
             title: 'GitHub',
@@ -41,11 +39,22 @@ export default function Links() {
             description: 'My work and projects',
             icon: ''
         }
-    ];
+    ]);
+    const cursorRef = useRef<HTMLSpanElement>(null);
+
+    useEffect(() => {
+        const fetchLinks = async () => {
+            const response = await fetch('/api/links');
+            const data = await response.json();
+            console.log(data.links);
+            data.success ? setLinks(data.links) : console.error('Failed to fetch links:', data.error);
+        };
+
+        fetchLinks();
+    }, []);
 
     useEffect(() => {
         const promptInterval = setInterval(() => {
-
             setCurrentLine((prevLine) => {
                 if (prevLine >= promptLines.length - 1) {
                     return prevLine;
@@ -60,6 +69,10 @@ export default function Links() {
                             } else {
                                 cursorRef.current.classList.remove(styles.visible);
                             }
+                        }
+                        if (nextLine === promptLines.length - 1) {
+                            console.log('Loading completed');
+                            setLoadingCompleted(true);
                         }
                     }, i * 17.5);
                 }
@@ -96,14 +109,14 @@ export default function Links() {
 
             ctx.fillStyle = '#0F0';
             ctx.font = `${fontSize}px monospace`;
-            
+
             // Draw from top to bottom
             for (let i = 0; i < dropsTop.length; i++) {
                 const text = binary[Math.floor(Math.random() * binary.length)];
                 ctx.fillText(text, i * fontSize, dropsTop[i] * fontSize);
 
                 const probability = 0.995; // The likelihood of displaying a character (1 - probability)
-                
+
                 if (dropsTop[i] * fontSize > canvas.height && Math.random() > probability) {
                     dropsTop[i] = 0;
                 }
@@ -116,7 +129,7 @@ export default function Links() {
                 const text = binary[Math.floor(Math.random() * binary.length)];
                 ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize);
                 const probability = 0.995; // The likelihood of displaying a character
-                
+
                 if (dropsBottom[i] * fontSize > canvas.height && Math.random() > probability) {
                     dropsBottom[i] = 0;
                 }
@@ -170,11 +183,30 @@ export default function Links() {
                     </div>
                 </div>
 
+                <div className={styles.footer}>
+                    <div className={styles.terminal}>
+                        <div className={styles.terminalLine}>
+                            <span>
+                                {promptLines.slice(1, currentLine).map((line, index) => (
+                                    <span key={index}>
+                                        <span className={styles.prompt}>$</span>{line}
+                                        <span className={styles.terminalBreak}></span>
+                                    </span>
+                                ))}
+
+                                <span className={styles.prompt}>$</span>
+                                {currentPrompt}
+                                <span ref={cursorRef} className={styles.cursorRef}>█</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <div className={styles.linksGrid}>
                     {links.map((link, index) => (
                         <div
                             key={link.id}
-                            className={styles.linkCard}
+                            className={`${styles.linkCard} ${!loadingCompleted ? styles.hidden : ''}`}
                             style={mounted ? { animationDelay: `${index * 0.1}s` } : undefined}
                         >
                             <div className={styles.linkHeader}>
@@ -213,25 +245,6 @@ export default function Links() {
                             <div className={styles.cardScanline}></div>
                         </div>
                     ))}
-                </div>
-
-                <div className={styles.footer}>
-                    <div className={styles.terminal}>
-                        <div className={styles.terminalLine}>
-                            <span>
-                                {promptLines.slice(1, currentLine).map((line, index) => (
-                                    <span key={index}>
-                                        <span className={styles.prompt}>$</span>{line}
-                                        <span className={styles.terminalBreak}></span>
-                                    </span>
-                                ))}
-
-                                <span className={styles.prompt}>$</span>
-                                {currentPrompt}
-                                <span ref={cursorRef} className={styles.cursorRef}>█</span>
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
