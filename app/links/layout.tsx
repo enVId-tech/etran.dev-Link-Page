@@ -14,14 +14,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Domain Resources",
+    title: "Links - Domain Resources",
     description: "Links and resources for domain problems.",
     icons: {
         icon: icon.src
     }
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }): React.ReactElement {
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
     return (
         <html lang="en" suppressHydrationWarning>
             <body className={`${geistSans.variable} ${geistMono.variable}`}>
