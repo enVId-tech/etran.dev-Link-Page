@@ -54,14 +54,14 @@ export default function Error() {
 
             ctx.fillStyle = '#0F0';
             ctx.font = `${fontSize}px monospace`;
-            
+
             // Draw from top to bottom
             for (let i = 0; i < dropsTop.length; i++) {
                 const text = binary[Math.floor(Math.random() * binary.length)];
                 ctx.fillText(text, i * fontSize, dropsTop[i] * fontSize);
 
                 const probability = 0.995; // The likelihood of displaying a character (1 - probability)
-                
+
                 if (dropsTop[i] * fontSize > canvas.height && Math.random() > probability) {
                     dropsTop[i] = 0;
                 }
@@ -69,12 +69,14 @@ export default function Error() {
                 dropsTop[i]++;
             }
 
+            const buffer: number = 10; // Small buffer to prevent flickering at the bottom
+
             // Draw from bottom to top
             for (let i = 0; i < dropsBottom.length; i++) {
                 const text = binary[Math.floor(Math.random() * binary.length)];
-                ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize);
+                ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize + buffer);
                 const probability = 0.995; // The likelihood of displaying a character
-                
+
                 if (dropsBottom[i] * fontSize > canvas.height && Math.random() > probability) {
                     dropsBottom[i] = 0;
                 }

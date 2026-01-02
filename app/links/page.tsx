@@ -134,10 +134,12 @@ export default function Links() {
                 dropsTop[i]++;
             }
 
+            const buffer: number = 10; // Small buffer to prevent flickering at the bottom                
+
             // Draw from bottom to top
             for (let i = 0; i < dropsBottom.length; i++) {
                 const text = binary[Math.floor(Math.random() * binary.length)];
-                ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize);
+                ctx.fillText(text, i * fontSize, canvas.height - dropsBottom[i] * fontSize + buffer);
                 const probability = 0.995; // The likelihood of displaying a character
 
                 if (dropsBottom[i] * fontSize > canvas.height && Math.random() > probability) {
@@ -216,49 +218,50 @@ export default function Links() {
                     {links.map((link, index) => {
                         const linkStatus = linksActive.find(la => la.link === link.url);
                         const isInactive = linkStatus && !linkStatus.active;
-                        
+
                         return (
-                        <div
-                            key={link.id}
-                            className={`${styles.linkCard} ${!loadingCompleted ? styles.hidden : ''} ${isInactive ? styles.inactive : ''}`}
-                            style={mounted ? { animationDelay: `${index * 0.1}s` } : undefined}
-                        >
-                            <div className={styles.linkHeader}>
-                                <div className={styles.linkIcon}>{link.icon}</div>
-                                <div className={styles.linkNumber}>
-                                    [{String(link.id).padStart(2, '0')}]
+                            <div
+                                key={link.id}
+                                className={`${styles.linkCard} ${!loadingCompleted ? styles.hidden : ''} ${isInactive ? styles.inactive : ''}`}
+                                style={mounted ? { animationDelay: `${index * 0.1}s` } : undefined}
+                            >
+                                <div className={styles.linkHeader}>
+                                    <div className={styles.linkIcon}>{link.icon}</div>
+                                    <div className={styles.linkNumber}>
+                                        [{String(link.id).padStart(2, '0')}]
+                                    </div>
                                 </div>
+
+                                <h3 className={styles.linkTitle}>{link.title}</h3>
+                                <p className={styles.linkDescription}>{link.description}</p>
+
+                                <div className={styles.linkUrl}>
+                                    <code>{link.url}</code>
+                                </div>
+
+                                <div className={styles.linkActions}>
+                                    <a
+                                        href={link.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className={styles.visitButton}
+                                    >
+                                        <span className={styles.buttonPrefix}>{'>'}</span> ACCESS
+                                    </a>
+
+                                    <button
+                                        onClick={() => handleCopyLink(link)}
+                                        className={styles.copyButton}
+                                    >
+                                        <span className={styles.buttonPrefix}>{'>'}</span>
+                                        {copiedId === link.id ? 'COPIED' : 'COPY'}
+                                    </button>
+                                </div>
+
+                                <div className={styles.cardScanline}></div>
                             </div>
-
-                            <h3 className={styles.linkTitle}>{link.title}</h3>
-                            <p className={styles.linkDescription}>{link.description}</p>
-
-                            <div className={styles.linkUrl}>
-                                <code>{link.url}</code>
-                            </div>
-
-                            <div className={styles.linkActions}>
-                                <a
-                                    href={link.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={styles.visitButton}
-                                >
-                                    <span className={styles.buttonPrefix}>{'>'}</span> ACCESS
-                                </a>
-
-                                <button
-                                    onClick={() => handleCopyLink(link)}
-                                    className={styles.copyButton}
-                                >
-                                    <span className={styles.buttonPrefix}>{'>'}</span>
-                                    {copiedId === link.id ? 'COPIED' : 'COPY'}
-                                </button>
-                            </div>
-
-                            <div className={styles.cardScanline}></div>
-                        </div>
-                    )})}
+                        )
+                    })}
                 </div>
             </div>
         </div>
