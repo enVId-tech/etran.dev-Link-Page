@@ -1,36 +1,145 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Domain Resources Web
 
-## Getting Started
+A Next.js web application for managing and displaying domain resources with active link monitoring. This project provides a dynamic link management system with real-time URL validation and status tracking.
 
-First, run the development server:
+## Features
+
+- **Link Management**: Display and manage a collection of links with metadata (title, URL, description, icon)
+- **Active Link Monitoring**: Real-time validation of link availability
+- **MongoDB Integration**: Persistent storage using Mongoose
+- **API Routes**: RESTful API endpoints for link operations
+- **Modern UI**: Built with React 19 and SCSS styling
+- **Docker Support**: Containerized deployment ready
+- **TypeScript**: Fully typed for better development experience
+
+## Prerequisites
+
+- Node.js (latest version)
+- MongoDB instance (local or cloud-based)
+- npm, yarn, pnpm, or bun package manager
+
+## Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/enVId-tech/Domain-Resources-Web.git
+   cd Domain-Resources-Web
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables:**
+   
+   Create a `stack.env` file in the root directory with your MongoDB connection string and other required variables:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string
+   # Add other environment variables as needed
+   ```
+
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser:**
+   
+   Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
+
+## Available Scripts
+
+- `npm run dev` - Start the development server
+- `npm run build` - Build the production application
+- `npm run start` - Start the production server
+- `npm run lint` - Run ESLint for code quality
+- `npm run ncu` - Update all dependencies to their latest versions
+
+## Docker Deployment
+
+Build and run the application using Docker:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Build the Docker image
+docker build -t domain-resources-web .
+
+# Run the container
+docker run -p 3090:3090 --env-file stack.env domain-resources-web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at [http://localhost:3090](http://localhost:3090).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+├── app/
+│   ├── api/
+│   │   └── links/          # API endpoints for link management
+│   │       └── route.ts    # GET endpoint for fetching links
+│   ├── error/              # Error page components
+│   ├── links/              # Links display page
+│   ├── utils/
+│   │   ├── db.ts          # MongoDB connection utilities
+│   │   └── validation.ts   # URL validation utilities
+│   ├── _app.tsx           # Custom App component
+│   ├── layout.tsx         # Root layout
+│   └── page.tsx           # Home page
+├── public/                # Static assets
+├── styles/                # SCSS stylesheets
+├── Dockerfile             # Docker configuration
+├── next.config.ts         # Next.js configuration
+├── tsconfig.json          # TypeScript configuration
+└── package.json           # Dependencies and scripts
+```
 
-## Learn More
+## API Endpoints
 
-To learn more about Next.js, take a look at the following resources:
+### GET `/api/links`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Fetches all links from the database with their active status.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Response:**
+```json
+{
+  "success": true,
+  "links": [
+    {
+      "id": 1,
+      "title": "Example Link",
+      "url": "https://example.com",
+      "description": "Description text",
+      "icon": "icon-url"
+    }
+  ],
+  "linksActive": [
+    {
+      "link": "https://example.com",
+      "active": true
+    }
+  ]
+}
+```
 
-## Deploy on Vercel
+**Cache:** 20 minutes with 10-minute stale-while-revalidate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: [Next.js 16.1.1](https://nextjs.org/) with App Router
+- **Runtime**: React 19.2.3
+- **Language**: TypeScript 5
+- **Database**: MongoDB with Mongoose 9.1.1
+- **Styling**: SASS/SCSS 1.97.1
+- **Icons**: React Icons 5.5.0
+- **Linting**: ESLint 9
+- **Containerization**: Docker
+
+### Environment Variables
+
+Ensure your `stack.env` file contains:
+- `MONGODB_URI` - MongoDB connection string
+- Additional environment variables as needed for your deployment
+
+## License
+
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
