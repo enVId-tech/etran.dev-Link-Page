@@ -119,7 +119,7 @@ export async function checkUrl(url: string): Promise<boolean> {
             method: 'HEAD'
         });
 
-        const urlResolves: boolean = response.ok;
+        const urlResolves: boolean = response.status < 400;
 
         if (!url.includes(DOMAIN_NAME)) return urlResolves
 
