@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 interface DomainObject {
-    domain_names: string;
+    domain_names: string[];
 }
 
 interface TokenResponse {
@@ -50,7 +50,7 @@ export async function getToken(): Promise<string> {
     return json.token;
 }
 
-export async function getProxyHosts(): Promise<string[]> {
+export async function getProxyHosts(): Promise<string[][]> {
     const token: string = await getToken();
 
     if (!NPM_LINK) return []
@@ -65,14 +65,14 @@ export async function getProxyHosts(): Promise<string[]> {
 
     const json2: DomainObject[] = await response2.json();
 
-    const responseArr: string[] = [];
+    const responseArr: string[][] = [[]];
 
     for (const key in json2) {
         if (!json2[key].domain_names) {
             continue;
         }
 
-        const name: string = json2[key].domain_names[0]
+        const name: string[] = json2[key].domain_names
 
         responseArr.push(name);
     }
@@ -80,7 +80,7 @@ export async function getProxyHosts(): Promise<string[]> {
     return responseArr;
 }
 
-export async function getRedirectHosts(): Promise<string[]> {
+export async function getRedirectHosts(): Promise<string[][]> {
     const token: string = await getToken();
 
     if (!NPM_LINK) return []
@@ -95,14 +95,14 @@ export async function getRedirectHosts(): Promise<string[]> {
 
     const json2: DomainObject[] = await response2.json();
 
-    const responseArr: string[] = [];
+    const responseArr: string[][] = [[]];
 
     for (const key in json2) {
         if (!json2[key].domain_names) {
             continue;
         }
 
-        const name: string = json2[key].domain_names[0]
+        const name: string[] = json2[key].domain_names
 
         responseArr.push(name);
     }
@@ -115,33 +115,46 @@ export async function checkUrl(url: string): Promise<boolean> {
         if (!NPM_LINK) return true
         if (!DOMAIN_NAME) return true
 
-        const response = await fetch(`${url}`, {
+        let response = await fetch(`${url}`, {
             method: 'HEAD'
         });
 
+        if (response.status >= 400) {
+            response = await fetch(`${url}`, {
+                method: 'GET'
+            }); 
+        }
+
         const urlResolves: boolean = response.status < 400;
+
+        if (!urlResolves) {
+            return false;
+        }
 
         if (!url.includes(DOMAIN_NAME)) return urlResolves
 
-        const rHosts = await getRedirectHosts();
-        const pHosts = await getProxyHosts();
+        const rHosts: string[][] = await getRedirectHosts();
+        const pHosts: string[][] = await getProxyHosts();
 
         let rHostResolves: boolean = false;
         let pHostResolves: boolean = false;
 
         for (let link of rHosts) {
             const urlSplit = url.split("//")[1]
-            if (urlSplit === link) {
-                rHostResolves = true;
-                break;
-            }
+            link.forEach((domain) => {
+                if (urlSplit.startsWith(domain)) {
+                    rHostResolves = true;
+                }
+            });
         }
+
         for (let link of pHosts) {
             const urlSplit = url.split("//")[1]
-            if (urlSplit === link) {
-                pHostResolves = true;
-                break;
-            }
+            link.forEach((domain) => {
+                if (urlSplit.startsWith(domain)) {
+                    pHostResolves = true;
+                }
+            });
         }
 
         return (urlResolves && (rHostResolves || pHostResolves))
